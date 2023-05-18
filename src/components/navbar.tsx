@@ -24,7 +24,6 @@ export const Navbar = () => {
           <button onClick={signUserOut}>Log out</button>
         </div>
       )}
-      
     </div>
   );
 };
