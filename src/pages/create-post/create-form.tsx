@@ -30,6 +30,12 @@ export const CreateForm = () => {
   const postRef = collection(db, "posts");
 
   const onCreatePost = async (data: CreatePostData) => {
+    console.log({
+      ...data,
+      username: user?.displayName,
+      userId: user?.uid,
+    });
+
     await addDoc(postRef, {
       ...data,
       username: user?.displayName,
@@ -38,12 +44,12 @@ export const CreateForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onCreatePost)}>
+    <form onSubmit={handleSubmit(onCreatePost)} className="create-post">
       <input placeholder="Title..." {...register("title")} />
       <p style={{ color: "red" }}>{errors.title?.message}</p>
       <textarea placeholder="Description..." {...register("description")} />
       <p style={{ color: "red" }}>{errors.description?.message}</p>
-      <input type="submit" />
+      <input type="submit" className="onSubmit"/>
     </form>
   );
 };
