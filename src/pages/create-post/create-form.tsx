@@ -32,11 +32,11 @@ export const CreateForm = () => {
   const postRef = collection(db, "posts");
 
   const onCreatePost = async (data: CreatePostData) => {
-    console.log({
-      ...data,
-      username: user?.displayName,
-      userId: user?.uid,
-    });
+  //   console.log({
+  //     ...data,
+  //     username: user?.displayName,
+  //     userId: user?.uid,
+  //   });
 
     await addDoc(postRef, {
       ...data,
