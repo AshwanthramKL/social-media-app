@@ -1,4 +1,12 @@
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
 import { auth, db } from "../../config/firebase";
 import { Post as IPost } from "./main";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -9,6 +17,7 @@ interface Props {
 }
 
 interface Like {
+  likeId: string;
   userId: string;
 }
 
@@ -24,16 +33,49 @@ export const Post = (props: Props) => {
 
   const getLikes = async () => {
     const data = await getDocs(likesDoc);
-    console.log(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    setLikes(data.docs.map((doc) => ({ userId: doc.data().userId })));
+    // console.log(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    setLikes(
+      data.docs.map((doc) => ({ userId: doc.data().userId, likeId: doc.id }))
+    );
   };
 
   const addLike = async () => {
     try {
-      await addDoc(likesRef, { userId: user?.uid, postId: post.id });
+      const newDoc = await addDoc(likesRef, {
+        userId: user?.uid,
+        postId: post.id,
+      });
+      //   to change state after liking and display the liked emoji, i.e the filled heart
+
       if (user) {
         setLikes((prev) =>
-          prev ? [...prev, { userId: user.uid }] : [{ userId: user.uid }]
+          prev
+            ? [...prev, { userId: user.uid, likeId: newDoc.id }]
+            : [{ userId: user.uid, likeId: newDoc.id }]
+        );
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const removeLike = async () => {
+    try {
+      const likeToDeleteQuery = query(
+        likesRef,
+        where("postId", "==", post.id),
+        where("userId", "==", user?.uid)
+      );
+
+      const likeToDeleteData = await getDocs(likeToDeleteQuery);
+      const likeId = likeToDeleteData.docs[0].id;
+      const likeToDelete = doc(db, "likes", likeId);
+      await deleteDoc(likeToDelete);
+      //   to change state after liking and display the liked emoji, i.e the filled heart
+
+      if (user) {
+        setLikes(
+          (prev) => prev && prev.filter((like) => like.likeId !== likeId)
         );
       }
     } catch (err) {
@@ -56,7 +98,7 @@ export const Post = (props: Props) => {
 
       <div className="footer">
         <p>@{post.username}</p>
-        <button onClick={addLike}>
+        <button onClick={hasUserLiked ? removeLike : addLike}>
           {" "}
           {hasUserLiked ? <>&#x2764;</> : <>&#9825;</>}
         </button>
