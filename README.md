@@ -1,6 +1,7 @@
 # Social media application
 
-This is a solution to the Menu project which is a part of John Smilga's 15 JS projects tutorial.
+A simple social media application that lets users create posts and view posts after logging into their google account.  
+Built following [Pedro Tech's tutorial](https://youtu.be/jUBc7K9XCcU).
 
 Pages:
 
